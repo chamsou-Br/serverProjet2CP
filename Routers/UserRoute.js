@@ -5,6 +5,8 @@ const bodyparser = require('body-parser');
 const bcrypt  = require('bcrypt');
 const {HandlError, getToken,checkuser} = require('../Controllers/AuthController');
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+
 
 // 953077210388-hrrqunh00aerbng60d4firkbdh2954q3.apps.googleusercontent.com
 // CPAIK-KgtMpTr2_3AMXWV7xG
@@ -17,21 +19,21 @@ UserRoute.use(bodyparser.json());
         email : req.body.email,
         password : req.body.password,
         compte : req.body.compte,
-        remembre : req.body.remembre,
+        remembre : req.body.remember,
         withGoogle : req.body.withGoogle
      }
-     console.log(userSign);
+     res.cookie('chamsou' , 'chamsou');
      try{
         const user = await UserModal.login(userSign.email,userSign.password,userSign.compte,userSign.withGoogle);
+        res.cookie('chahinda' , 'chamsou');
         if (userSign.remembre) {
-            const token = getToken(user._id);
-            res.cookie('jwt' , token,{
-                httpOnly : true ,
-                
+            const token = await getToken(user._id);
+            console.log("cookies")
+            res.cookie('user_projet_2cp' , token,{
+                httpOnly : true ,        
                 maxAge : 12 * 30 * 24 * 3600 * 1000,
             });
         }
-  
         res.status(201).json({user :user,existe : true});
      }
      catch(e){
@@ -45,9 +47,7 @@ UserRoute.post('/registre',async (req , res) => {
     let password = null;
     if (req.body.password ) {
          password = await bcrypt.hash(req.body.password , salt);
-    }
-
-    
+    }   
     try{
         if ( req.body.password.length < 6) {
             throw Error('password min length')
@@ -63,7 +63,7 @@ UserRoute.post('/registre',async (req , res) => {
         newuser.password = password;
         newuser.save();
         const token = getToken(newuser._id);
-        res.cookie('jwt' , token,{
+        res.cookie('user_projet_2cp' , token,{
             httpOnly : true ,
             maxAge : 12 * 30 * 24 * 3600 * 1000,
         })
@@ -74,6 +74,28 @@ UserRoute.post('/registre',async (req , res) => {
         res.json({err});
     }
 
+})
+
+UserRoute.get('/checkUser' ,(req  , res) => {
+    const token = (req.cookies.user_projet_2cp )
+    if (token) {
+        jwt.verify(token,"projet 2cp N 27",async (err , encoded) => {
+            if (err) {
+                throw Error('error in JWT');
+            }
+            if (encoded) {
+                const user = await UserModal.findById(encoded.id);
+                res.send({existe : true , user : user }) ;
+            }
+        })
+    }
+    else res.send({existe : false})
+})
+
+UserRoute.get('/logout'  , (req , res) => {
+    res.clearCookie('user_projet_2cp')
+    console.log('deconexion')
+    res.send(req.cookies.chamsou);
 })
 
 module.exports = UserRoute;

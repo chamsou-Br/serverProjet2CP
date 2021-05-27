@@ -23,7 +23,7 @@ const dossierSchema = new Schema({
     marche: {
         encore : {
             type : Boolean,
-            default : false,
+            default : true,
         },
         finish : {
             type : Boolean,

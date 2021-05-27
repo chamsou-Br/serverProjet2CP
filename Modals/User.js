@@ -47,18 +47,13 @@ UserSheama.statics.login = async(email , password,compte,withGoogle) => {
         if (user) {
             const auth = await bcrypt.compare(password,user.password)
             if (auth) {
-                if (JSON.stringify(user.compte) == JSON.stringify(compte)) {
                     return user
-                }
-                throw Error('incorrect copmte');
             }
             throw Error('incorrect Password');
         }
         throw Error ('incorrect Email');
     }
     else {
-        console.log(email);
-        console.log(true);
         const user = await UserModal.findOne({email : email }) ;
         if (user) {
             return (user);

@@ -71,8 +71,8 @@ MarcheRouter.post('/marche/:id' , async (req , res) => {
                 num_convention: req.body.num_convention ? req.body.num_convention : doc.marche.num_convention,
                 respo_dossier: req.body.respo_dossier ? req.body.respo_dossier : doc.marche.respo_dossier,
                 duree_trait: req.body.duree_trait ? req.body.duree_trait : doc.marche.duree_trait,
-                encore : doc.budget.encore,
-                finish : doc.budget.finish
+                encore : doc.marche.encore,
+                finish : doc.marche.finish
             }
              if (req.body.type === 1) {
                 doc.commande.encore = true ;
@@ -115,8 +115,8 @@ MarcheRouter.post('/commande/:id',async (req, res) => {
                 num_bon_reception: req.body.num_bon_reception ? req.body.num_bon_reception :  doc.commande.num_bon_reception,
                 date_envoi:req.body.date_envoi ? req.body.date_envoi :  doc.commande.date_envoi,
                 duree_trait:req.body.duree_trait ? req.body.duree_trait :  doc.commande.duree_trait,
-                encore : doc.budget.encore,
-                finish : doc.budget.finish
+                encore : doc.commande.encore,
+                finish : doc.commande.finish
             }
             if (req.body.type === 1 ) {
                 doc.budget.encore = true ;
@@ -189,8 +189,8 @@ MarcheRouter.post('/comptable/:id',async (req, res) => {
                 date_paiement:  req.body.date_paiement ? req.body.date_paiement : doc.comptable.date_paiement,
                 observations:  req.body.observations ? req.body.observations : doc.comptable.observations,
                 duree_trait:  req.body.duree_trait ? req.body.duree_trait : doc.comptable.duree_trait,
-                encore : doc.budget.encore,
-                finish : doc.budget.finish
+                encore : doc.compatable.encore,
+                finish : doc.compatable.finish
             }
             if (req.body.type === 1) {
                 doc.finish = true ;

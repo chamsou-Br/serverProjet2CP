@@ -1,8 +1,9 @@
+const { json } = require('body-parser');
 const jwt = require('jsonwebtoken');
 const UserModal = require('../Modals/User');
 
 const checkuser =  (req , res , next) => {
-    var token = req.cookies.jwt ;
+    const token = req.cookies.jwt ;
     if (token) {
         jwt.verify(token,"projet 2cp N 27",async (err , encoded) => {
             if (err) {

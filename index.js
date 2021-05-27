@@ -11,10 +11,38 @@ const InitRoute = require('./Routers/LoadingInitRoute');
 // connect Server
 const app = express();
 
+//cookies 
+app.use(cookieParser());
+
 // cors 
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
-app.use(cors());
+
+
+// Add headers
+app.use(function (req, res, next) {
+
+  // Website you wish to allow to connect
+
+  const allowedOrigins = ['http://127.0.0.1:8020', 'http://localhost:3000', 'http://127.0.0.1:9000', 'http://localhost:9000'];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+       res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
+  // Request methods you wish to allow
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, PATCH, DELETE');
+
+  // Request headers you wish to allow
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization');
+
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader('Access-Control-Allow-Credentials', true);
+
+  // Pass to next layer of middleware
+  next();
+});
 
 app.listen(4000,()=> {
     console.log('server Connection');
@@ -24,19 +52,16 @@ app.get('/indexe' , (req , res) => {
   res.send({age : 19});
 })
 
-//cookies 
-app.use(cookieParser());
+
 
 // test cookies
 app.get('/set-cookies', (req, res) => {
-    console.log('cookies');
-
-    // res.setHeader('Set-Cookie', 'newUser=true');
-    
-    res.cookie('newUser', false);
-    res.cookie('isEmployee', true, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true });
-    res.send('you got the cookies!');
   
+    res.cookie('newUser', 'dfwgxbhcj');
+    res.cookie('isEmployee', true, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true });
+    res.cookie('chamsou' , "dfvgbdhdbfgj"); 
+    console.log(req.cookies.chamsou);
+    res.send('you got the cookies! ' + req.cookies.chams);
   });
   
   app.get('/read-cookies', (req, res) => {
