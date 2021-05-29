@@ -76,20 +76,30 @@ UserRoute.post('/registre',async (req , res) => {
 
 })
 
-UserRoute.get('/checkUser' ,(req  , res) => {
-    const token = (req.cookies.user_projet_2cp )
-    if (token) {
-        jwt.verify(token,"projet 2cp N 27",async (err , encoded) => {
-            if (err) {
-                throw Error('error in JWT');
-            }
-            if (encoded) {
-                const user = await UserModal.findById(encoded.id);
-                res.send({existe : true , user : user }) ;
-            }
-        })
+UserRoute.get('/checkUser' ,async (req  , res) => {
+    try {
+        const token = (req.cookies.user_projet_2cp ) 
+        if (token) {
+            jwt.verify(token,"projet 2cp N 27",async (err , encoded) => {
+                if (err) {
+                    res.send({existe : false})
+                }
+                if (encoded) {
+                    const user = await UserModal.findById(encoded.id);
+                    if (user) {
+                        res.send({existe : true , user : user }) ;
+                    }
+                    
+                }
+            })
+        }
+        else{ res.send({existe : false})}
+
+    }catch(e) {
+        res.send({existe : true , user : user })
+        console.log(e.message)
     }
-    else res.send({existe : false})
+  
 })
 
 UserRoute.get('/logout'  , (req , res) => {

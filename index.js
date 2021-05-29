@@ -7,6 +7,7 @@ const  UserRoute = require('./Routers/UserRoute')
 const MarcheRouter = require('./Routers/MarcheRouter');
 const cookieParser = require('cookie-parser');
 const InitRoute = require('./Routers/LoadingInitRoute');
+const NotifRouter = require('./Routers/notification');
 
 // connect Server
 const app = express();
@@ -97,4 +98,5 @@ mongoose.connection.once('open',()=> {
 app.use(UserRoute);
 app.use('/dossiers',MarcheRouter);
 app.use(InitRoute);
+app.use(NotifRouter);
 

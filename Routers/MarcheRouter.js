@@ -2,8 +2,10 @@ const express = require('express');
 const MarcheRouter = express.Router();
 const bodyparser = require('body-parser');
 const MarcheModal = require("../Modals/marche");
+const UserModal = require('../Modals/User');
 
 MarcheRouter.use(bodyparser.json());
+const dateNow = new Date().getUTCDate().toString() + '/' + (new Date().getUTCMonth() + 1 ).toString() + '/' + new Date().getUTCFullYear().toString()
 
 MarcheRouter.post('/test' , (req , res) => {
     res.send(req.body);
@@ -42,6 +44,19 @@ MarcheRouter.post('/newDossiers' , async (req , res) => {
                         duree_trait: req.body.duree_trait
                     }
         })
+        const users_ = await UserModal.find();
+        users_.map(async(user) => {
+            const notif = {
+                typeof : "complete" ,
+                date : dateNow ,
+                notif : "service marche creer nouvelle Dossier",
+                idDossier : newDocument._id
+
+            } 
+            user.notification = [notif,...user.notification]
+            user.isnotif = true;
+            await user.save();
+        })
         res.send(newDocument);
 
     }catch(e) {
@@ -56,9 +71,8 @@ MarcheRouter.post('/marche/:id' , async (req , res) => {
     
     const doc = await MarcheModal.findById(req.params.id);
     if(req.body.type === 0 || req.body.type === 1 ) {
-        console.log(doc);
+        console.log( doc.marche.type_prestation);
         try{
-            console.log(req.body,req.params.id)
             doc.marche = { 
                 type_prestation: req.body.type_prestation ? req.body.type_prestation : doc.marche.type_prestation,
                 objet: req.body.objet ? req.body.objet : doc.marche.objet,
@@ -77,6 +91,19 @@ MarcheRouter.post('/marche/:id' , async (req , res) => {
              if (req.body.type === 1) {
                 doc.commande.encore = true ;
                 doc.marche.finish = true;
+                const users_marche = await UserModal.find({service : 'commande'});
+                users_marche.map(async(user) => {
+                    const notif = {
+                        typeof : "complete" ,
+                        date : dateNow ,
+                        notif : "service marche a complete ce dossier",
+                        idDossier : req.body.idDossier
+
+                    } 
+                    user.notification = [notif,...user.notification]
+                    user.isnotif = true;
+                    await user.save();
+                })
              }
              await  doc.save();
              res.send(doc);
@@ -85,6 +112,19 @@ MarcheRouter.post('/marche/:id' , async (req , res) => {
             console.log(e.message);
         }
     }else if(req.body.type === 2) {
+        const users_marche = await UserModal.find({});
+        users_marche.map(async (user) => {
+            const notif = {
+                typeof : "cancel" ,
+                date : dateNow ,
+                notif : "ce dossier est blocké par service marche",
+                idDossier : req.body.idDossier
+
+            } 
+            user.notification = [notif,...user.notification]
+            user.isnotif = true;
+            await user.save();
+        })
         doc.block = true ;
         await  doc.save();
          res.send(doc);
@@ -121,10 +161,36 @@ MarcheRouter.post('/commande/:id',async (req, res) => {
             if (req.body.type === 1 ) {
                 doc.budget.encore = true ;
                 doc.commande.finish = true;
+                const users_commande = await UserModal.find({service : 'budget'});
+                users_commande.map(async(user) => {
+                    const notif = {
+                        typeof : "complete" ,
+                        date : dateNow ,
+                        notif : "service commande a complete ce dossier",
+                        idDossier : req.body.idDossier
+
+                    } 
+                    user.notification = [notif,...user.notification]
+                    user.isnotif = true;
+                    await user.save();
+                })
             }
             await doc.save();
             res.send(doc)
         }else if (req.body.type === 2) {
+            const users_commande = await UserModal.find({});
+            users_commande.map(async (user) => {
+                const notif = {
+                    typeof : "cancel" ,
+                    date : dateNow ,
+                    notif : "ce dossier est blocké par service commande",
+                    idDossier : req.body.idDossier
+    
+                } 
+                user.notification = [notif,...user.notification]
+                user.isnotif = true;
+                await user.save();
+            })
             doc.block = true ;
             await  doc.save();
              res.send(doc);
@@ -158,14 +224,40 @@ MarcheRouter.post('/budget/:id',async (req, res) => {
             if (req.body.type === 1 ) {
                 doc.comptable.encore = true ;
                 doc.budget.finish = true;
+                const users_budget = await UserModal.find({service : 'compatibilite'});
+                users_budget.map(async(user) => {
+                    const notif = {
+                        typeof : "complete" ,
+                        date : dateNow ,
+                        notif : "service budget a complete ce dossier",
+                        idDossier : req.body.idDossier
+
+                    } 
+                    user.notification = [notif,...user.notification]
+                    user.isnotif = true;
+                    await user.save();
+                })
             }
-            await doc.save();
-            res.send(doc)
-        }else if (req.body.type === 2) {
+                await doc.save();
+                res.send(doc)  
+        }else {if (req.body.type === 2) {
+            const users_budget = await UserModal.find({});
+            users_budget.map(async (user) => {
+                const notif = {
+                    typeof : "cancel" ,
+                    date : dateNow ,
+                    notif : "ce dossier est blocké par service budget",
+                    idDossier : req.body.idDossier
+    
+                } 
+                user.notification = [notif,...user.notification]
+                user.isnotif = true;
+                await user.save();
+            })
             doc.block = true ;
             await  doc.save();
              res.send(doc);
-        }
+        }}
           
     }catch(e) {
         console.log(e.message);
@@ -193,12 +285,38 @@ MarcheRouter.post('/comptable/:id',async (req, res) => {
                 finish : doc.compatable.finish
             }
             if (req.body.type === 1) {
+                const users_compa = await UserModal.find({});
+                users_compa.map(async(user) => {
+                    const notif = {
+                        typeof : "complete" ,
+                        date : dateNow ,
+                        notif : "service compatibilité a complete ce dossier",
+                        idDossier : req.body.idDossier
+
+                    } 
+                    user.notification = [notif,...user.notification]
+                    user.isnotif = true;
+                    await user.save();
+                })
                 doc.finish = true ;
                 doc.comptable.finish = true;
             }
             await doc.save();
             res.send(doc)
         }else if (req.body.type === 2) {
+            const users_compa = await UserModal.find({});
+            users_compa.map(async (user) => {
+                const notif = {
+                    typeof : "cancel" ,
+                    date : dateNow ,
+                    notif : "ce dossier est blocké par service compatibilité",
+                    idDossier : req.body.idDossier
+    
+                } 
+                user.notification = [notif,...user.notification]
+                user.isnotif = true;
+                await user.save();
+            })
             doc.block = true ;
             await  doc.save();
              res.send(doc);

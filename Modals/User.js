@@ -36,6 +36,19 @@ const UserSheama = new mongoose.Schema({
     compte : {
         type : [String],
         required : [true , 'please choose an compte']
+    },
+    notification : [{
+        typeof : String ,
+        date : String,
+        notif : String,
+        idDossier : String
+    }],
+    imageSocial  : {
+        type : String
+    },
+    isnotif : {
+        type : Boolean,
+        default  :false
     }
 },{
     timestamps : true
