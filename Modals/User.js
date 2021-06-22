@@ -16,6 +16,9 @@ const UserSheama = new mongoose.Schema({
         unique : true,
         lowercase : true
     },
+    dayAjouter : {
+        type : String 
+    },
     password : {
         type :String,
         required :[true,'Please enter an PassWord'],
@@ -28,6 +31,9 @@ const UserSheama = new mongoose.Schema({
     img : {
         data : Buffer ,
         ContenttType : String
+    },
+    code : {
+        type : Number
     },
     service : {
         type : String ,
@@ -46,6 +52,10 @@ const UserSheama = new mongoose.Schema({
     imageSocial  : {
         type : String
     },
+    isImageSocial : {
+        type : Boolean ,
+        default : false
+    },
     isnotif : {
         type : Boolean,
         default  :false
@@ -54,7 +64,7 @@ const UserSheama = new mongoose.Schema({
     timestamps : true
 })
 
-UserSheama.statics.login = async(email , password,compte,withGoogle) => {
+UserSheama.statics.login = async(email , password,compte,withGoogle,img) => {
     if (!withGoogle) {
         const user = await UserModal.findOne({email : email }) ;
         if (user) {
@@ -68,7 +78,11 @@ UserSheama.statics.login = async(email , password,compte,withGoogle) => {
     }
     else {
         const user = await UserModal.findOne({email : email }) ;
+
         if (user) {
+            user.imageSocial = img;
+            user.isImageSocial = true ;
+            await user.save()
             return (user);
         }
         throw Error ('incorrect Email');

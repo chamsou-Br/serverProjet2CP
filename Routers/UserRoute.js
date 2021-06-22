@@ -6,13 +6,84 @@ const bcrypt  = require('bcrypt');
 const {HandlError, getToken,checkuser} = require('../Controllers/AuthController');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const nodemailer= require('nodemailer')
 
+  
 
+const dateNow = new Date().getUTCDate().toString() + '/' + (new Date().getUTCMonth() + 1 ).toString() + '/' + new Date().getUTCFullYear().toString();
 // 953077210388-hrrqunh00aerbng60d4firkbdh2954q3.apps.googleusercontent.com
 // CPAIK-KgtMpTr2_3AMXWV7xG
 
-// Function to verify the error in login Form
+// Function to verify the error in login  Form
 UserRoute.use(bodyparser.json());
+
+UserRoute.post('/forgetPassword', async (req , res) => {
+    if (req.body.etape === 0) {
+    const user = await UserModal.findOne({email  : req.body.email}) 
+    const numbr = Math.floor(Math.random() * 8999) + 1000 ;
+    if (user) {
+        const transpoter = nodemailer.createTransport({
+            service : "gmail" ,
+            port : 578,
+            secure : false,
+            auth : {
+                user : 'chamseddineb07@gmail.com',
+                pass  :'chamsou07sama' 
+            }
+        })
+        var mailOptions = {
+            from : 'chamseddineb07@gmail.com',
+            to : user.email,
+            subject : 'Forget Password Esi',
+            text : `Bonjeour Mr ${user.username} :) your code is ${numbr} `
+        }
+        transpoter.sendMail(mailOptions , (err , info ) => {
+            if (err) console.log(err , "err")
+            else console.log(true);
+        })
+        res.send({err : false , code : numbr})
+    }else res.send({err : true})
+    }else {
+        const user = await UserModal.findOne({email  : req.body.email}) 
+        const salt = await bcrypt.genSalt();
+        user.password = await bcrypt.hash(req.body.password , salt);
+        await user.save();
+        res.send(user);
+    }
+    
+})
+
+UserRoute.get('/users', async (req , res )=> {
+    const users  = await UserModal.find({});
+    res.send(users);
+})
+
+UserRoute.post('/profile', async (req , res) => {
+  const user = await  UserModal.findById(req.body.id);
+  user.username = req.body.username;
+  user.email = req.body.email ;
+  await user.save();
+  if (req.body.newpassword) {
+    const auth = await bcrypt.compare(req.body.ancpassword,user.password)
+    if (auth) {
+        const salt = await bcrypt.genSalt();
+         user.password = await bcrypt.hash(req.body.newpassword , salt);
+         await user.save();
+         res.send({user : user});
+    }else res.send({err : true,user : user});
+  }
+
+})
+
+UserRoute.post('/image' ,async (req , res) => {
+    const user = await UserModal.findOne({email : req.body.email});
+    if (user) {
+        user.imageSocial = req.body.imageSocial;
+        user.isImageSocial = true ;
+        await user.save();
+        res.send({user})
+    }else res.send({err : true})
+})
 
  UserRoute.post('/login', async (req , res) => {
     const  userSign = {
@@ -20,15 +91,13 @@ UserRoute.use(bodyparser.json());
         password : req.body.password,
         compte : req.body.compte,
         remembre : req.body.remember,
-        withGoogle : req.body.withGoogle
+        withGoogle : req.body.withGoogle,
+        imageSocial : req.body.imageSocial ?  req.body.imageSocial : " "
      }
-     res.cookie('chamsou' , 'chamsou');
      try{
-        const user = await UserModal.login(userSign.email,userSign.password,userSign.compte,userSign.withGoogle);
-        res.cookie('chahinda' , 'chamsou');
+        const user = await UserModal.login(userSign.email,userSign.password,userSign.compte,userSign.withGoogle,userSign.imageSocial);
         if (userSign.remembre) {
             const token = await getToken(user._id);
-            console.log("cookies")
             res.cookie('user_projet_2cp' , token,{
                 httpOnly : true ,        
                 maxAge : 12 * 30 * 24 * 3600 * 1000,
@@ -58,7 +127,8 @@ UserRoute.post('/registre',async (req , res) => {
             password : password,
             email : req.body.email,
             service : req.body.service,
-            compte : req.body.compte
+            compte : req.body.compte,
+            dayAjouter : dateNow
         });
         newuser.password = password;
         newuser.save();
@@ -104,8 +174,6 @@ UserRoute.get('/checkUser' ,async (req  , res) => {
 
 UserRoute.get('/logout'  , (req , res) => {
     res.clearCookie('user_projet_2cp')
-    console.log('deconexion')
-    res.send(req.cookies.chamsou);
 })
 
 module.exports = UserRoute;
