@@ -116,6 +116,7 @@ const dossierSchema = new Schema({
             type: String,
         },
     },
+    
     budget: {
         encore : {
             type : Boolean,

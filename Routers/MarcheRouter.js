@@ -91,6 +91,7 @@ MarcheRouter.post('/marche/:id' , async (req , res) => {
              if (req.body.type === 1) {
                 doc.commande.encore = true ;
                 doc.marche.finish = true;
+                doc.commande.date_reception = dateNow ;
                 const users_marche = await UserModal.find({service : 'commande'});
                 users_marche.map(async(user) => {
                     const notif = {
@@ -161,6 +162,7 @@ MarcheRouter.post('/commande/:id',async (req, res) => {
             if (req.body.type === 1 ) {
                 doc.budget.encore = true ;
                 doc.commande.finish = true;
+                doc.budget.date_reception = dateNow ;
                 const users_commande = await UserModal.find({service : 'budget'});
                 users_commande.map(async(user) => {
                     const notif = {
@@ -222,8 +224,10 @@ MarcheRouter.post('/budget/:id',async (req, res) => {
                 finish : doc.budget.finish
             }
             if (req.body.type === 1 ) {
+                console.log('yes');
                 doc.comptable.encore = true ;
                 doc.budget.finish = true;
+                doc.comptable.date_reception = dateNow ;
                 const users_budget = await UserModal.find({service : 'compatibilite'});
                 users_budget.map(async(user) => {
                     const notif = {
@@ -281,10 +285,12 @@ MarcheRouter.post('/comptable/:id',async (req, res) => {
                 date_paiement:  req.body.date_paiement ? req.body.date_paiement : doc.comptable.date_paiement,
                 observations:  req.body.observations ? req.body.observations : doc.comptable.observations,
                 duree_trait:  req.body.duree_trait ? req.body.duree_trait : doc.comptable.duree_trait,
-                encore : doc.compatable.encore,
-                finish : doc.compatable.finish
+                encore : doc.comptable.encore,
+                finish : doc.comptable.finish
             }
             if (req.body.type === 1) {
+                doc.comptable.date_cmplement = dateNow;
+                doc.comptable.encore = false ;
                 const users_compa = await UserModal.find({});
                 users_compa.map(async(user) => {
                     const notif = {
