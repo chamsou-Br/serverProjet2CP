@@ -58,6 +58,13 @@ UserRoute.get('/users', async (req , res )=> {
     res.send(users);
 })
 
+UserRoute.post('/notif' , async (req , res) => {
+    const user = await UserModal.findById(req.body._id);
+    console.log(user)
+    user.notification = req.body.notification ;
+    user.save();
+})
+
 UserRoute.post('/profile', async (req , res) => {
   const user = await  UserModal.findById(req.body.id);
   user.username = req.body.username;
