@@ -89,7 +89,7 @@ app.use(bodyparser.urlencoded({ extended: true }));
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
-mongoose.connect("mongodb://localhost/Projet2cp",{useUnifiedTopology : true , useNewUrlParser : true});
+mongoose.connect("mongodb+srv://tutorial:V2Io8IQIBZo0rU4v@cluster0.2rpnr.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",{useUnifiedTopology : true , useNewUrlParser : true});
 mongoose.connection.once('open',()=> {
     console.log('DataBase connection');
 });

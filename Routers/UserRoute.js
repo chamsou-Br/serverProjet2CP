@@ -14,7 +14,8 @@ const dateNow = new Date().getUTCDate().toString() + '/' + (new Date().getUTCMon
 // 953077210388-hrrqunh00aerbng60d4firkbdh2954q3.apps.googleusercontent.com
 // CPAIK-KgtMpTr2_3AMXWV7xG
 
-// Function to verify the error in login  Form
+// Function to verify the error in login  Form                 user : 'chamseddineb07@gmail.com',pass  :'chamsou2002' 
+                
 UserRoute.use(bodyparser.json());
 
 UserRoute.post('/forgetPassword', async (req , res) => {
@@ -27,12 +28,12 @@ UserRoute.post('/forgetPassword', async (req , res) => {
             port : 578,
             secure : false,
             auth : {
-                user : 'chamseddineb07@gmail.com',
-                pass  :'chamsou07sama' 
+                user : 'projett27@gmail.com',
+                pass  :'131069aa' 
             }
         })
         var mailOptions = {
-            from : 'chamseddineb07@gmail.com',
+            from : 'projett27@gmail.com',
             to : user.email,
             subject : 'Forget Password Esi',
             text : `Bonjeour Mr ${user.username} :) your code is ${numbr} `

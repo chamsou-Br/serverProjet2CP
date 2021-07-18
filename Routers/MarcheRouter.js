@@ -175,6 +175,7 @@ MarcheRouter.post('/commande/:id',async (req, res) => {
                     user.notification = [notif,...user.notification]
                     user.isnotif = true;
                     await user.save();
+                    console.log(user.notification)
                 })
             }
             await doc.save();
@@ -228,7 +229,7 @@ MarcheRouter.post('/budget/:id',async (req, res) => {
                 doc.comptable.encore = true ;
                 doc.budget.finish = true;
                 doc.comptable.date_reception = dateNow ;
-                const users_budget = await UserModal.find({service : 'compatibilite'});
+                const users_budget = await UserModal.find({service : 'compatable'});
                 users_budget.map(async(user) => {
                     const notif = {
                         typeof : "complete" ,
