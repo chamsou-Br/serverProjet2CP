@@ -49,7 +49,7 @@ MarcheRouter.post('/newDossiers' , async (req , res) => {
             const notif = {
                 typeof : "complete" ,
                 date : dateNow ,
-                notif : "service marche creer nouvelle Dossier",
+                notif : "service marche a créé nouveau dossier",
                 idDossier : newDocument._id
 
             } 
@@ -93,11 +93,13 @@ MarcheRouter.post('/marche/:id' , async (req , res) => {
                 doc.marche.finish = true;
                 doc.commande.date_reception = dateNow ;
                 const users_marche = await UserModal.find({service : 'commande'});
-                users_marche.map(async(user) => {
+                const ordon =   await UserModal.find({service : "ordonnateur"});
+
+                ordon.map(async(user) => {
                     const notif = {
                         typeof : "complete" ,
                         date : dateNow ,
-                        notif : "service marche a complete ce dossier",
+                        notif : "service marche a completé un dossier",
                         idDossier : req.body.idDossier
 
                     } 
@@ -105,6 +107,19 @@ MarcheRouter.post('/marche/:id' , async (req , res) => {
                     user.isnotif = true;
                     await user.save();
                 })
+                users_marche.map(async(user) => {
+                    const notif = {
+                        typeof : "complete" ,
+                        date : dateNow ,
+                        notif : "service marche a completé un dossier",
+                        idDossier : req.body.idDossier
+
+                    } 
+                    user.notification = [notif,...user.notification]
+                    user.isnotif = true;
+                    await user.save();
+                })
+
              }
              await  doc.save();
              res.send(doc);
@@ -118,7 +133,7 @@ MarcheRouter.post('/marche/:id' , async (req , res) => {
             const notif = {
                 typeof : "cancel" ,
                 date : dateNow ,
-                notif : "ce dossier est blocké par service marche",
+                notif : "un dossier est blocké par le service marche",
                 idDossier : req.body.idDossier
 
             } 
@@ -164,18 +179,31 @@ MarcheRouter.post('/commande/:id',async (req, res) => {
                 doc.commande.finish = true;
                 doc.budget.date_reception = dateNow ;
                 const users_commande = await UserModal.find({service : 'budget'});
+                const ordon =   await UserModal.find({service : "ordonnateur"});
+
                 users_commande.map(async(user) => {
                     const notif = {
                         typeof : "complete" ,
                         date : dateNow ,
-                        notif : "service commande a complete ce dossier",
+                        notif : "le service commande a completé un dossier",
                         idDossier : req.body.idDossier
 
                     } 
                     user.notification = [notif,...user.notification]
                     user.isnotif = true;
                     await user.save();
-                    console.log(user.notification)
+                })
+                ordon.map(async(user) => {
+                    const notif = await {
+                        typeof : "complete" ,
+                        date : dateNow ,
+                        notif : "service marche a completé un dossier",
+                        idDossier : req.body.idDossier
+
+                    } 
+                    user.notification = [notif,...user.notification];
+                     user.isnotif = true;
+                    await user.save();
                 })
             }
             await doc.save();
@@ -186,7 +214,7 @@ MarcheRouter.post('/commande/:id',async (req, res) => {
                 const notif = {
                     typeof : "cancel" ,
                     date : dateNow ,
-                    notif : "ce dossier est blocké par service commande",
+                    notif : "un dossier est blocké par le service commande",
                     idDossier : req.body.idDossier
     
                 } 
@@ -230,11 +258,24 @@ MarcheRouter.post('/budget/:id',async (req, res) => {
                 doc.budget.finish = true;
                 doc.comptable.date_reception = dateNow ;
                 const users_budget = await UserModal.find({service : 'compatable'});
+                const ordon =   await UserModal.find({service : "ordonnateur"});
+                ordon.map(async(user) => {
+                    const notif = {
+                        typeof : "complete" ,
+                        date : dateNow ,
+                        notif : "service marche a completé un dossier",
+                        idDossier : req.body.idDossier
+
+                    } 
+                    user.notification = [notif,...user.notification]
+                    user.isnotif = true;
+                    await user.save();
+                })
                 users_budget.map(async(user) => {
                     const notif = {
                         typeof : "complete" ,
                         date : dateNow ,
-                        notif : "service budget a complete ce dossier",
+                        notif : "le service budget a completé un dossier",
                         idDossier : req.body.idDossier
 
                     } 
@@ -251,7 +292,7 @@ MarcheRouter.post('/budget/:id',async (req, res) => {
                 const notif = {
                     typeof : "cancel" ,
                     date : dateNow ,
-                    notif : "ce dossier est blocké par service budget",
+                    notif : "le dossier est blocké par le service budget",
                     idDossier : req.body.idDossier
     
                 } 
@@ -297,7 +338,7 @@ MarcheRouter.post('/comptable/:id',async (req, res) => {
                     const notif = {
                         typeof : "complete" ,
                         date : dateNow ,
-                        notif : "service compatibilité a complete ce dossier",
+                        notif : "le service compatibilité a completé un dossier",
                         idDossier : req.body.idDossier
 
                     } 
@@ -316,7 +357,7 @@ MarcheRouter.post('/comptable/:id',async (req, res) => {
                 const notif = {
                     typeof : "cancel" ,
                     date : dateNow ,
-                    notif : "ce dossier est blocké par service compatibilité",
+                    notif : "un dossier est blocké par le service compatibilité",
                     idDossier : req.body.idDossier
     
                 } 
